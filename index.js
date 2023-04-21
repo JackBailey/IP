@@ -3,7 +3,7 @@ const express = require("express");
 const app = express()
 
 if (process.env.TRUST_PROXY) {
-    app.set("trust proxy", process.env.TRUST_PROXY || "127.0.0.1");
+    app.set("trust proxy", process.env.TRUST_PROXY.split(",") || "127.0.0.1");
 }
 
 app.get("/", (req, res) => {
