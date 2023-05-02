@@ -14,7 +14,7 @@ jobs:
               uses: flownative/action-docker-build@master
               with:
                 tag_ref: ${{ github.ref }}
-                image_name: jackbailey/ip
+                image_name: jackbailey/ip/base
                 registry_password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
             - name: Publish release to docker.io
               uses: flownative/action-docker-publish-semver@master
@@ -24,7 +24,7 @@ jobs:
       
                 source_image_name: jackbailey/test
       
-                target_image_name: jackbailey/test
+                target_image_name: jackbailey/test/base
                 target_registry_username: jackbailey
                 target_registry_password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
                 target_registry_endpoint: https://index.docker.io/v1/
