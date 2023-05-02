@@ -1,8 +1,6 @@
-name: Docker Image CI
-
 on:
     push:
-        
+        paths-ignore: ["**.md"]
 
 jobs:
     build:
@@ -10,21 +8,25 @@ jobs:
 
         steps:
             - uses: actions/checkout@v3
-            - name: Build Docker image
-              uses: flownative/action-docker-build@master
-              with:
-                tag_ref: ${{ github.ref }}
-                image_name: jackbailey/ip/base
-                registry_password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-            - name: Publish release to docker.io
-              uses: flownative/action-docker-publish-semver@master
-              with:
-                tag_ref: ${{ github.ref }}
-                tag_latest: 'yes'
-      
-                source_image_name: jackbailey/test
-      
-                target_image_name: jackbailey/test/base
-                target_registry_username: jackbailey
-                target_registry_password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-                target_registry_endpoint: https://index.docker.io/v1/
+            - name: Get version
+              run: |
+                IFS='.' read -ra VERSION <<< "$(cat VERSION)"
+
+                MAJOR="${VERSION[0]}"
+                MINOR="${VERSION[0]}.${VERSION[1]}"
+                PATCH="${VERSION[0]}.${VERSION[1]}.${VERSION[2]}"
+
+                IMAGE=jackbailey/ip
+                DOCKER_TAGS="-t $IMAGE:$MAJOR -t $IMAGE:$MINOR -t $IMAGE:$PATCH -t $IMAGE:latest"
+
+                echo "DOCKER_TAGS=$DOCKER_TAGS" >> $GITHUB_ENV
+            - name: docker login
+              env:
+                  DOCKER_USER: jackbailey
+                  DOCKER_PASS: ${{secrets.DOCKERHUB_ACCESS_TOKEN}}
+              run: |
+                  docker login -u $DOCKER_USER -p $DOCKER_PASS
+            - name: Build the Docker image
+              run: docker build . --file Dockerfile $DOCKER_TAGS
+            - name: Docker Push
+              run: docker push jackbailey/ip --all-tags
