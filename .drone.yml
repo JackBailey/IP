@@ -8,12 +8,11 @@ steps:
     commands:
     - SEMVER_MAJOR="$$(cat VERSION | cut -d. -f1)"
     - SEMVER_MINOR="$$(cat VERSION | cut -d. -f2)"
-    - SEMVER_PATCH="$$(cat VERSION | cut -d. -f1)"
+    - SEMVER_PATCH="$$(cat VERSION | cut -d. -f3)"
 
-    - echo "DOCKER_REPO=jackbailey/ip" >> $${DRONE_WORKSPACE}/env
-    - echo "SEMVER_MAJOR=$SEMVER_MAJOR" >> $${DRONE_WORKSPACE}/env
-    - echo "SEMVER_MINOR=$SEMVER_MAJOR.$SEMVER_MINOR" >> $${DRONE_WORKSPACE}/env
-    - echo "SEMVER=$SEMVER_MAJOR.$SEMVER_MINOR.$SEMVER_PATCH" >> $${DRONE_WORKSPACE}/env
+    - DOCKER_REPO=jackbailey/ip
+
+    - echo -n "latest,$SEMVER_MAJOR.$SEMVER_MINOR.$SEMVER_PATCH,$SEMVER_MAJOR.$SEMVER_MINOR,$SEMVER_MAJOR" > .tags
       
   - name: docker
     image: plugins/docker
@@ -22,10 +21,5 @@ steps:
         from_secret: DOCKERHUB_USERNAME
       password:
           from_secret: DOCKERHUB_PASSWORD
-      repo: ${DOCKER_REPO}
-      tags:
-        - latest
-        - ${SEMVER_MAJOR}
-        - ${SEMVER_MINOR}
-        - ${SEMVER}
+      repo: jackbailey/ip
       dockerfile: Dockerfile
