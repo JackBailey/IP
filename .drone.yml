@@ -10,10 +10,10 @@ steps:
     - SEMVER_MINOR="$$(cat VERSION | cut -d. -f2)"
     - SEMVER_PATCH="$$(cat VERSION | cut -d. -f1)"
 
-    - echo "DRONE_REPO=jackbailey/ip" >> $${DRONE_WORKSPACE}/env
-    - echo "DRONE_SEMVER_MAJOR=$SEMVER_MAJOR" >> $${DRONE_WORKSPACE}/env
-    - echo "DRONE_SEMVER_MINOR=$SEMVER_MAJOR.$SEMVER_MINOR" >> $${DRONE_WORKSPACE}/env
-    - echo "DRONE_SEMVER=$SEMVER_MAJOR.$SEMVER_MINOR.$SEMVER_PATCH" >> $${DRONE_WORKSPACE}/env
+    - echo "DOCKER_REPO=jackbailey/ip" >> $${DRONE_WORKSPACE}/env
+    - echo "SEMVER_MAJOR=$SEMVER_MAJOR" >> $${DRONE_WORKSPACE}/env
+    - echo "SEMVER_MINOR=$SEMVER_MAJOR.$SEMVER_MINOR" >> $${DRONE_WORKSPACE}/env
+    - echo "SEMVER=$SEMVER_MAJOR.$SEMVER_MINOR.$SEMVER_PATCH" >> $${DRONE_WORKSPACE}/env
       
   - name: docker
     image: plugins/docker
@@ -22,10 +22,10 @@ steps:
         from_secret: DOCKERHUB_USERNAME
       password:
           from_secret: DOCKERHUB_PASSWORD
-      repo: ${DRONE_REPO}
+      repo: ${DOCKER_REPO}
       tags:
         - latest
-        - ${DRONE_SEMVER_MAJOR}
-        - ${DRONE_SEMVER_MINOR}
-        - ${DRONE_SEMVER}
+        - ${SEMVER_MAJOR}
+        - ${SEMVER_MINOR}
+        - ${SEMVER}
       dockerfile: Dockerfile
