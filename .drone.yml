@@ -1,0 +1,16 @@
+kind: pipeline
+type: docker
+name: Build and Publish Image
+
+steps:
+- name: docker
+  image: plugins/docker
+  settings:
+    username:
+       from_secret: DOCKERHUB_USERNAME
+    password:
+        from_secret: DOCKERHUB_PASSWORD
+    repo: jackbailey/ip
+    tags:
+    - latest
+    dockerfile: Dockerfile
