@@ -11,7 +11,7 @@ steps:
   - name: Get version
     image: alpine
     commands:
-        - >
+        - |
           IFS='.' read -ra VERSION <<< "$(cat VERSION)"
 
           SEMVER_MAJOR="${VERSION[0]}"
