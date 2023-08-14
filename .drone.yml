@@ -3,14 +3,37 @@ type: docker
 name: Build and Publish Image
 
 steps:
-- name: docker
-  image: plugins/docker
-  settings:
-    username:
-       from_secret: DOCKERHUB_USERNAME
-    password:
-        from_secret: DOCKERHUB_PASSWORD
-    repo: jackbailey/ip
-    tags:
-    - latest
-    dockerfile: Dockerfile
+  - name: clone repository
+    image: plugins/git
+    settings:
+      depth: 1
+
+  - name: Get version
+    image: alpine
+    commands:
+        - |
+        IFS='.' read -ra VERSION <<< "$(cat VERSION)"
+
+        SEMVER_MAJOR="${VERSION[0]}"
+        SEMVER_MINOR="${VERSION[0]}.${VERSION[1]}"
+        SEMVER="${VERSION[0]}.${VERSION[1]}.${VERSION[2]}"
+
+        echo "DRONE_REPO=jackbailey/ip" >> ${DRONE_WORKSPACE}/env
+        echo "DRONE_SEMVER_MAJOR=$SEMVER_MAJOR" >> ${DRONE_WORKSPACE}/env
+        echo "DRONE_SEMVER_MINOR=$SEMVER_MINOR" >> ${DRONE_WORKSPACE}/env
+        echo "DRONE_SEMVER=$SEMVER" >> ${DRONE_WORKSPACE}/env
+
+  - name: docker
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: DOCKERHUB_USERNAME
+      password:
+          from_secret: DOCKERHUB_PASSWORD
+      repo: jackbailey/ip
+      tags:
+        - latest
+        - ${DRONE_SEMVER_MAJOR}
+        - ${DRONE_SEMVER_MINOR}
+        - ${DRONE_SEMVER}
+      dockerfile: Dockerfile
