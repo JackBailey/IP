@@ -35,7 +35,7 @@ steps:
 kind: pipeline
 type: docker
 name: Build and Publish Image (Beta)
-when:
+trigger:
   event:
   - push
   branch:
