@@ -6,16 +6,14 @@ steps:
   - name: Get version
     image: alpine
     commands:
-    - IFS='.' read -ra VERSION <<< "$(cat VERSION)"
-    - SEMVER_MAJOR="$${VERSION[0]}"
-    - SEMVER_MAJOR="$${VERSION[0]}"
-    - SEMVER_MINOR="$${VERSION[0]}.$${VERSION[1]}"
-    - SEMVER="$${VERSION[0]}.$${VERSION[1]}.$${VERSION[2]}"
+    - SEMVER_MAJOR="$$(cat VERSION | cut -d. -f1)"
+    - SEMVER_MINOR="$$(cat VERSION | cut -d. -f2)"
+    - SEMVER_PATCH="$$(cat VERSION | cut -d. -f1)"
 
     - echo "DRONE_REPO=jackbailey/ip" >> $${DRONE_WORKSPACE}/env
     - echo "DRONE_SEMVER_MAJOR=$SEMVER_MAJOR" >> $${DRONE_WORKSPACE}/env
-    - echo "DRONE_SEMVER_MINOR=$SEMVER_MINOR" >> $${DRONE_WORKSPACE}/env
-    - echo "DRONE_SEMVER=$SEMVER" >> $${DRONE_WORKSPACE}/env
+    - echo "DRONE_SEMVER_MINOR=$SEMVER_MAJOR.$SEMVER_MINOR" >> $${DRONE_WORKSPACE}/env
+    - echo "DRONE_SEMVER=$SEMVER_MAJOR.$SEMVER_MINOR.$SEMVER_PATCH" >> $${DRONE_WORKSPACE}/env
       
   - name: docker
     image: plugins/docker
@@ -24,7 +22,7 @@ steps:
         from_secret: DOCKERHUB_USERNAME
       password:
           from_secret: DOCKERHUB_PASSWORD
-      repo: jackbailey/ip
+      repo: ${DRONE_REPO}
       tags:
         - latest
         - ${DRONE_SEMVER_MAJOR}
